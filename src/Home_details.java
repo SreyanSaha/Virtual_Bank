@@ -46,15 +46,6 @@ public class Home_details {
         amt_send=Double.parseDouble(amount_sendt);
         return true;
     }
-//    protected void fetch_balance(ArrayList<String> list){
-//        String query=String.format("SELECT Balance from BANK_DETAILS where Account_no=%d",Integer.parseInt(this.acc_number));
-//        try{
-//            statement=connect.prepareStatement(query);
-//            ResultSet result=statement.executeQuery(query);
-//            list.add(1,Integer.toString(result.getInt("Balance")));
-//        }
-//        catch (Exception e){System.out.println(e.getMessage());}
-//    }
     protected boolean verify_all_account_details(int s_acc, int b_acc, String b_name){
         String query1=String.format("SELECT Holder_fname, Account_no, Account_pin, Balance FROM BANK_DETAILS WHERE Account_no=%d",s_acc);
         String query2=String.format("SELECT Holder_fname, Account_no, Balance FROM BANK_DETAILS WHERE Account_no=%d",b_acc);
