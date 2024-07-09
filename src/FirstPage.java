@@ -371,7 +371,7 @@ public class FirstPage extends JFrame implements ActionListener, MouseListener {
             int acc=Integer.parseInt(acc_no);
             Login l=new Login(gmail,pass,acc);
             int x=l.try_query();
-            if(x==-1){l.create_transaction_table();System.out.println("Logged in!!");this.dispose();new HomePage(acc_no);}
+            if(x==-1){System.out.println("Logged in!!");this.dispose();new HomePage(acc_no);}
             else if(x==3){
                 gtext.setBackground(Color.red);
                 wrong_msg1.setVisible(true);

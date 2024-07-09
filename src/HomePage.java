@@ -7,21 +7,22 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 public class HomePage extends JFrame implements ActionListener, MouseListener {
-    protected static boolean dashboard_accessed=false,balance_updated=false,verify_details=false;
-    private static JButton log_out,deposit,withdraw,mini,dash_b,statement,change_pass,send_money,verify_ben,ini_tb,ok_b;
-    private static ArrayList<String>list,recent_list,send_money_list;
+    protected static boolean verify_details=false;
+    private static JButton log_out,deposit,withdraw,mini,dash_b,statement,change_pass,send_money,verify_ben,ini_tb,cancle_but,proceed_but;
+    private static ArrayList<String>list,recent_list;
     private static JLayeredPane lp;
-    private static JPanel dash_pan,deposite_pan;
+    private static JPanel dash_pan,deposite_pan,pin_pan;
     private static JTextField source_acct,beni_acct,beni_namet,amount_sendt;
-    private static JLabel ver_ben_msg,cannot_transfer,transaction_details,transaction_details2,transfer_failed;
+    private static JLabel ver_ben_msg,cannot_transfer,transaction_details,transaction_details2,transfer_failed,chances,status;
+    private static JPasswordField transfer_pin;
     private static Home_details details;
-    private static int dr_cr=0;
-    private static JPasswordField transfer_pint;
-    HomePage(String account_no){
+    private static int dr_cr=0,s_acc,b_acc;
+    private String account_no;
+    protected HomePage(String account_no){
+        this.account_no=account_no;
         details=new Home_details(account_no);
         list=get_object_of_list();
         recent_list=get_obj_of_recent_list();
-        send_money_list=get_obj_of_send_money_list();
 
         lp=new JLayeredPane();
         lp.setBounds(1,1,1920,1080);
@@ -160,17 +161,18 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
     }
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource()==log_out){list.clear();dashboard_accessed=false;this.dispose();new FirstPage();}
+        if(e.getSource()==log_out){this.dispose();new FirstPage();}
         if(e.getSource()==verify_ben){
             cannot_transfer.setVisible(false);
             if(transfer_details_verify()){
                 verify_ben.setEnabled(false);
-                ver_ben_msg.setEnabled(true);
+                ver_ben_msg.setVisible(true);
             }
             else{
                 ver_ben_msg.setText("X Invalid Account Details");
                 ver_ben_msg.setForeground(Color.RED);
                 ver_ben_msg.setVisible(true);
+                verify_ben.setEnabled(true);
             }
         }
         else if(e.getSource()==deposit){
@@ -210,8 +212,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
             statement.setEnabled(true);
             change_pass.setEnabled(true);
             send_money.setEnabled(true);
-            if(!dashboard_accessed){details.fetch_dashboard_details(list);dashboard_accessed=true;}
-            else if(!balance_updated){details.fetch_balance(list);balance_updated=true;}
+            details.fetch_dashboard_details(list);
             lp.removeAll();
             lp.add(dash_pan());
         }
@@ -243,62 +244,95 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
             send_money.setEnabled(false);
         }
         else if(e.getSource()==ini_tb){
-            if(verify_details){
-                cannot_transfer.setText("Enter Pin ↓");
-                cannot_transfer.setForeground(Color.GREEN);
-                transfer_pint.setEnabled(true);
-                ok_b.setEnabled(true);
+            if(verify_details&&details.verify_transfer_amount(amount_sendt.getText())){
+                deposit.setEnabled(false);
+                withdraw.setEnabled(false);
+                mini.setEnabled(false);
+                dash_b.setEnabled(false);
+                statement.setEnabled(false);
+                change_pass.setEnabled(false);
+                send_money.setEnabled(false);
+                lp.removeAll();
+                lp.add(pin_pan());
             }
             else{
+                ver_ben_msg.setText("X Invalid Account Details");
+                ver_ben_msg.setForeground(Color.RED);
+                ver_ben_msg.setVisible(true);
+                verify_ben.setEnabled(true);
                 cannot_transfer.setText("Complete Verification!");
                 cannot_transfer.setForeground(Color.RED);
                 cannot_transfer.setVisible(true);
-                transfer_pint.setEnabled(false);
-                ok_b.setEnabled(false);
             }
         }
-        else if(e.getSource()==ok_b){
-            details.initiate_transfer();
+        else if (e.getSource()==cancle_but) {
+            deposit.setEnabled(true);
+            withdraw.setEnabled(true);
+            mini.setEnabled(true);
+            dash_b.setEnabled(false);
+            statement.setEnabled(true);
+            change_pass.setEnabled(true);
+            send_money.setEnabled(true);
+            details.fetch_dashboard_details(list);
+            lp.removeAll();
+            lp.add(dash_pan());
+        }
+        else if(e.getSource()==proceed_but){
+            if(details.valid_pin(String.valueOf(transfer_pin.getPassword()))){
+                chances.setVisible(false);
+                status.setText("Processing...");
+                status.setForeground(Color.GREEN);
+                transfer_pin.setEnabled(false);
+                if(details.initiate_transfer(status,transfer_pin,s_acc,b_acc)){
+                   status.setText("Transaction Successful...");
+                    JOptionPane.showConfirmDialog(this,"Transaction Successful","Transaction Status",JOptionPane.PLAIN_MESSAGE,JOptionPane.CLOSED_OPTION);
+                    deposit.setEnabled(false);
+                    withdraw.setEnabled(true);
+                    mini.setEnabled(true);
+                    dash_b.setEnabled(true);
+                    statement.setEnabled(true);
+                    change_pass.setEnabled(true);
+                    send_money.setEnabled(true);
+                    lp.removeAll();
+                    lp.add(deposit_pan());
+                }
+                else{
+                    status.setForeground(Color.RED);
+                    status.setText("Transaction Failed...");
+                    transfer_pin.setEnabled(false);
+                    proceed_but.setEnabled(false);
+                }
+            }
+            else{chances.setVisible(true);}
         }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if(e.getSource()==source_acct&&source_acct.getText().contains("        \b\benter account no\b\b")){
-            source_acct.setText("");
-        }
-        else if(e.getSource()==beni_acct&&beni_acct.getText().contains("        \b\benter account no\b\b")){
-            beni_acct.setText("");
-        }
-        else if (e.getSource()==beni_namet&&beni_namet.getText().contains("       \b\benter account name\b\b")) {
-            beni_namet.setText("");
-        }
-        else if(e.getSource()==amount_sendt&&amount_sendt.getText().contains("             \b\benter amount\b\b")){
-            amount_sendt.setText("");
-        }
+
+        if(e.getSource()==source_acct || e.getSource()==beni_acct || e.getSource()==beni_namet ||e.getSource()==amount_sendt){verify_ben.setEnabled(true);}
+        if(e.getSource()==transfer_pin){chances.setVisible(false);}
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if(e.getSource()==source_acct&&source_acct.getText().contains("        \b\benter account no\b\b")){
-            source_acct.setText("");
+        if(e.getSource()==source_acct){
             cannot_transfer.setVisible(false);
         }
-        else if(e.getSource()==beni_acct&&beni_acct.getText().contains("        \b\benter account no\b\b")){
-            beni_acct.setText("");
+        else if(e.getSource()==beni_acct){
             cannot_transfer.setVisible(false);
         }
-        else if (e.getSource()==beni_namet&&beni_namet.getText().contains("       \b\benter account name\b\b")) {
-            beni_namet.setText("");
-            cannot_transfer.setVisible(false);
-        }
-        else if(e.getSource()==amount_sendt&&amount_sendt.getText().contains("             \b\benter amount\b\b")){
-            amount_sendt.setText("");
+        else if (e.getSource()==beni_namet) {
             cannot_transfer.setVisible(false);
         }
         else if(e.getSource()==amount_sendt){
             cannot_transfer.setVisible(false);
         }
+        else if(e.getSource()==amount_sendt){
+            cannot_transfer.setVisible(false);
+        }
+        if(e.getSource()==source_acct || e.getSource()==beni_acct || e.getSource()==beni_namet || e.getSource()==amount_sendt){verify_ben.setEnabled(true);}
+        if(e.getSource()==transfer_pin){chances.setVisible(false);}
     }
 
     @Override
@@ -350,10 +384,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
             ini_tb.setBackground(Color.RED);
             ini_tb.setForeground(Color.WHITE);
         }
-        else if (e.getSource()==ok_b) {
-            ok_b.setBackground(Color.RED);
-            ok_b.setForeground(Color.WHITE);
-        }
     }
 
     @Override
@@ -389,10 +419,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         else if(e.getSource()==ini_tb){
             ini_tb.setBackground(Color.WHITE);
             ini_tb.setForeground(Color.BLACK);
-        }
-        else if(e.getSource()==ok_b){
-            ok_b.setBackground(Color.WHITE);
-            ok_b.setForeground(Color.BLACK);
         }
     }
     private JPanel dash_pan(){
@@ -454,23 +480,23 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         transaction_details.setForeground(Color.GREEN);
         transaction_details.setVisible(true);
 
+        dr_cr=details.get_recent_transaction(recent_list,dr_cr);
 
-        transaction_details2=new JLabel(String.format("%s ₹%s   on %s","Lolu"," 20000"," 07-08-2024"));
-        transaction_details2.setBounds(300,480,500,100);
+        transaction_details2=new JLabel(String.format("%s  ₹%s  on  %s",recent_list.get(0),recent_list.get(1),recent_list.get(2)));
+        transaction_details2.setBounds(300,480,800,100);
         transaction_details2.setFont(new Font("long Island",Font.PLAIN,30));
         transaction_details2.setForeground(Color.WHITE);
         transaction_details2.setVisible(true);
 
-        dr_cr=details.get_recent_transaction(recent_list,dr_cr);
         if(dr_cr==0){//dr==0,cr==1
             transaction_details.setText("⭧ Paid To:");
             transaction_details.setForeground(Color.RED);
-            transaction_details2.setBounds(220,480,500,100);
+            transaction_details2.setBounds(220,480,800,100);
         }
         else{
             transaction_details.setText("⭩ Received from:");
             transaction_details.setForeground(Color.GREEN);
-            transaction_details2.setBounds(300,480,500,100);
+            transaction_details2.setBounds(300,480,800,100);
         }
 
         dash_contents.add(name_lab);
@@ -509,7 +535,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         beni_details.setForeground(Color.RED);
         beni_details.setVisible(true);
 
-        source_acct=new JTextField("        \b\benter account no\b\b");
+        source_acct=new JTextField();
         source_acct.setBounds(275,132,400,40);
         source_acct.setForeground(Color.RED);
         source_acct.setBackground(Color.WHITE);
@@ -531,7 +557,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         beni_accn.setForeground(Color.WHITE);
         beni_accn.setVisible(true);
 
-        beni_acct=new JTextField("        \b\benter account no\b\b");
+        beni_acct=new JTextField();
         beni_acct.setBounds(450,352,400,40);
         beni_acct.setForeground(Color.RED);
         beni_acct.setBackground(Color.WHITE);
@@ -545,7 +571,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         beni_name.setForeground(Color.WHITE);
         beni_name.setVisible(true);
 
-        beni_namet=new JTextField("       \b\benter account name\b\b");
+        beni_namet=new JTextField();
         beni_namet.setBounds(450,452,400,40);
         beni_namet.setForeground(Color.RED);
         beni_namet.setBackground(Color.WHITE);
@@ -574,7 +600,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         send_amt.setForeground(Color.WHITE);
         send_amt.setVisible(true);
 
-        amount_sendt=new JTextField("             \b\benter amount\b\b");
+        amount_sendt=new JTextField();
         amount_sendt.setBounds(995,452,400,40);
         amount_sendt.setForeground(Color.RED);
         amount_sendt.setBackground(Color.WHITE);
@@ -597,31 +623,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         cannot_transfer.setForeground(Color.RED);
         cannot_transfer.setVisible(false);
 
-        JLabel pin=new JLabel("Pin: ");
-        pin.setBounds(930,560,1920,100);
-        pin.setFont(new Font("long Island",Font.PLAIN,30));
-        pin.setForeground(Color.WHITE);
-        pin.setVisible(true);
-
-        transfer_pint=new JPasswordField();
-        transfer_pint.setBounds(995,600,300,40);
-        transfer_pint.setForeground(Color.RED);
-        transfer_pint.setBackground(Color.WHITE);
-        transfer_pint.setFont(new Font("Long Island",Font.PLAIN,25));
-        transfer_pint.addMouseListener(this);
-        transfer_pint.setVisible(true);
-        transfer_pint.setEnabled(false);
-
-        ok_b=new JButton("OK");
-        ok_b.setBackground(Color.WHITE);
-        ok_b.setFocusable(false);
-        ok_b.setBounds(995,660,100,40);
-        ok_b.setFont(new Font("long Island",Font.PLAIN,20));
-        ok_b.setVisible(true);
-        ok_b.setEnabled(false);
-        ok_b.addActionListener(this);
-        ok_b.addMouseListener(this);
-
         transfer_failed=new JLabel("Transfer Failed!");
         transfer_failed.setBounds(1105,630,1920,100);
         transfer_failed.setFont(new Font("long Island",Font.BOLD,20));
@@ -642,17 +643,105 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         depo_contents.add(amount_sendt);
         depo_contents.add(ini_tb);
         depo_contents.add(cannot_transfer);
-        depo_contents.add(transfer_pint);
-        depo_contents.add(ok_b);
-        depo_contents.add(pin);
         depo_contents.add(transfer_failed);
         deposite_pan.add(depo_contents);
         return deposite_pan;
     }
+    private JPanel pin_pan(){
+        pin_pan=new JPanel();
+        pin_pan.setBounds(282,132,1920,1080);
+        pin_pan.setBackground(Color.GRAY);
+        pin_pan.setLayout(null);
+        pin_pan.setVisible(true);
+
+        JPanel pin_pan_contents=new JPanel();
+        pin_pan_contents.setBounds(30,30,1580,820);
+        pin_pan_contents.setBackground(new Color(0,35,100));
+        pin_pan_contents.setLayout(null);
+        pin_pan_contents.setVisible(true);
+
+        JLabel amt=new JLabel(String.format("Sending:    ₹%f",Double.parseDouble(amount_sendt.getText())));
+        amt.setBounds(990,130,500,100);
+        amt.setFont(new Font("long Island",Font.PLAIN,30));
+        amt.setForeground(Color.WHITE);
+        amt.setVisible(true);
+
+        JLabel to=new JLabel(String.format("To:              %s",beni_namet.getText()));
+        to.setBounds(990,80,500,100);
+        to.setFont(new Font("long Island",Font.PLAIN,30));
+        to.setForeground(Color.WHITE);
+        to.setVisible(true);
+
+        String an="XXXX";
+        an+=account_no.substring(4);
+
+        JLabel actno=new JLabel(String.format("From:    %s",an));
+        actno.setBounds(110,80,500,100);
+        actno.setFont(new Font("long Island",Font.PLAIN,30));
+        actno.setForeground(Color.WHITE);
+        actno.setVisible(true);
+
+        status=new JLabel("ENTER YOUR 6-DIGIT PIN:");
+        status.setBounds(450,250,500,100);
+        status.setFont(new Font("long Island",Font.PLAIN,35));
+        status.setForeground(Color.RED);
+        status.setVisible(true);
+
+        chances=new JLabel("Invalid Pin!");
+        chances.setBounds(820,325,500,100);
+        chances.setFont(new Font("long Island",Font.PLAIN,25));
+        chances.setForeground(Color.RED);
+        chances.setVisible(false);
+
+        JLabel pin_t=new JLabel("Pin:");
+        pin_t.setBounds(450,320,500,100);
+        pin_t.setFont(new Font("long Island",Font.PLAIN,30));
+        pin_t.setForeground(Color.WHITE);
+        pin_t.setVisible(true);
+
+        transfer_pin=new JPasswordField();
+        transfer_pin.setBounds(515,355,300,40);
+        transfer_pin.setForeground(Color.RED);
+        transfer_pin.setBackground(Color.WHITE);
+        transfer_pin.setFont(new Font("Long Island",Font.PLAIN,25));
+        transfer_pin.addMouseListener(this);
+        transfer_pin.setVisible(true);
+
+        proceed_but=new JButton("Proceed");
+        proceed_but.setBackground(Color.GREEN);
+        proceed_but.setForeground(Color.BLACK);
+        proceed_but.setFocusable(false);
+        proceed_but.setBounds(695,420,120,40);
+        proceed_but.setFont(new Font("long Island",Font.PLAIN,20));
+        proceed_but.setVisible(true);
+        proceed_but.addActionListener(this);
+        proceed_but.addMouseListener(this);
+
+        cancle_but=new JButton("Cancel");
+        cancle_but.setBackground(Color.RED);
+        cancle_but.setForeground(Color.BLACK);
+        cancle_but.setFocusable(false);
+        cancle_but.setBounds(450,420,120,40);
+        cancle_but.setFont(new Font("long Island",Font.PLAIN,20));
+        cancle_but.setVisible(true);
+        cancle_but.addActionListener(this);
+        cancle_but.addMouseListener(this);
+
+        pin_pan_contents.add(chances);
+        pin_pan_contents.add(transfer_pin);
+        pin_pan_contents.add(pin_t);
+        pin_pan_contents.add(amt);
+        pin_pan_contents.add(to);
+        pin_pan_contents.add(actno);
+        pin_pan_contents.add(status);
+        pin_pan_contents.add(proceed_but);
+        pin_pan_contents.add(cancle_but);
+        pin_pan.add(pin_pan_contents);
+        return pin_pan;
+    }
     private static ArrayList<String> get_object_of_list(){return new ArrayList<>();}
     private static ArrayList<String> get_obj_of_recent_list(){return new ArrayList<>();}
-    private static ArrayList<String> get_obj_of_send_money_list(){return new ArrayList<>();}
-    private static boolean transfer_details_verify(){
+    private boolean transfer_details_verify(){
         for (char c:source_acct.getText().toCharArray()){
             switch (c){
                 case '0','1','2','3','4','5','6','7','8','9'->{}
@@ -661,7 +750,10 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
                 }
             }
         }
-        int s_acc=Integer.parseInt(source_acct.getText());
+
+        if(!this.account_no.equals(source_acct.getText())){return false;}
+
+        s_acc=Integer.parseInt(source_acct.getText());
 
         for (char c:beni_acct.getText().toCharArray()){
             switch (c){
@@ -669,25 +761,23 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
                 default -> {return false;}
             }
         }
-        int b_acc=Integer.parseInt(beni_acct.getText());
 
-        for(char c:beni_namet.getText().split("")[0].toCharArray()){
+        if(this.account_no.equals(beni_acct.getText())){return false;}
+
+        b_acc=Integer.parseInt(beni_acct.getText());
+
+        for(char c:beni_namet.getText().toCharArray()){
             switch (c){
-                case '0','1','2','3','4','5','6','7','8','9'->{return false;}
+                case '1', '2', '3', '4', '5', '6', '7', '8', '9', '0','!','@','#','$','%','^','&','*','~',';','.',','->{return false;}
                 default -> {}
             }
         }
-        String b_name=beni_namet.getText().split("")[0];
 
-        for(char c:amount_sendt.getText().toCharArray()){
-            switch (c){
-                case '0','1','2','3','4','5','6','7','8','9'->{}
-                default -> {return false;}
-            }
-        }
-        double amt_send=Integer.parseInt(amount_sendt.getText());
+        String b_name=beni_namet.getText().trim();
 
-        verify_details=details.verify_all_account_details(s_acc, b_acc, b_name, send_money_list);
+        verify_details=details.verify_all_account_details(s_acc, b_acc, b_name);
+        ver_ben_msg.setText("✓ Beneficiary account verified");
+        ver_ben_msg.setForeground(Color.GREEN);
         return true;
     }
 }

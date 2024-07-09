@@ -41,9 +41,4 @@ public class Login {
         }
         return -1;
     }
-    protected void create_transaction_table(){
-        String transaction_table_query=String.format("CREATE TABLE IF NOT EXISTS Transaction_%s (Sl_no int primary key auto_increment, Account_no int not null, Holder_fname varchar(50) not null, Amount double not null, Balance double not null, Dr bit default 0, Cr bit default 0, Tdate_Ttime timestamp default current_timestamp, foreign key(Account_no) references BANK_DETAILS(Account_no) on delete cascade)",Integer.toString(oacc_no));
-        try {System.out.println(!statement.execute(transaction_table_query));}
-        catch (Exception e){System.out.println(e.getMessage());}
-    }
 }

@@ -27,8 +27,13 @@ public class SignUp {
         try{
             String query=String.format("INSERT INTO BANK_DETAILS (Account_no, Holder_fname, Holder_lname, Holder_password, Holder_ph, Holder_mail, Account_pin) VALUES (%d,'%s','%s','%s','%s','%s',%d)",acc_no,fname,lname,password,phone_n,mail,pin);
             int rows=statement.executeUpdate(query);
-            if(rows>0){System.out.println("Inserted!!");}
+            if(rows>0){create_transaction_table(acc_no);System.out.println("Inserted!!");}
         }
+        catch (Exception e){System.out.println(e.getMessage());}
+    }
+    protected void create_transaction_table(int acc_no){
+        String transaction_table_query=String.format("CREATE TABLE Transaction_%s (Sl_no int primary key auto_increment, Account_no int not null, Holder_fname varchar(50) not null, Amount double not null, Balance double not null, Dr int default 0, Cr int default 0, Tdate_Ttime timestamp default current_timestamp, foreign key(Account_no) references BANK_DETAILS(Account_no) on delete cascade)",Integer.toString(acc_no));
+        try {System.out.println(!statement.execute(transaction_table_query));}
         catch (Exception e){System.out.println(e.getMessage());}
     }
 }
