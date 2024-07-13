@@ -145,4 +145,59 @@ public class Home_details {
         }
         return Integer.parseInt(p) == acc_pin;
     }
+    protected boolean valid_old_pin(String p) {
+        if(!p.isEmpty()) {
+            for (char i : p.toCharArray()) {
+                switch (i) {
+                    case '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' -> {
+                    }
+                    default -> {
+                        return false;
+                    }
+                }
+            }
+            String query = String.format("SELECT Account_pin FROM BANK_DETAILS WHERE Account_no=%d", Integer.parseInt(acc_number));
+            try {
+                ResultSet res = statement1.executeQuery(query);
+                if (res.next()) {
+                    return res.getInt("Account_pin") == Integer.parseInt(p);
+                } else return false;
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+        }return false;
+    }
+    protected boolean verify_new_pin(String pin1,String pin2){
+        String []p={pin1,pin2};
+        if(!p[0].isEmpty()&&!p[1].isEmpty()) {
+            if(p[0].length()!=6||p[1].length()!=6){return false;}
+            for(int n=0;n<2;n++) {
+                for (char i : p[n].toCharArray()) {
+                    switch (i) {
+                        case '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' -> {
+                        }
+                        default -> {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }else{return false;}
+        acc_pin=Integer.parseInt(p[0]);
+        return p[0].equals(p[1]);
+    }
+    protected boolean update_new_pin(){
+        try{statement1.execute(String.format("UPDATE BANK_DETAILS SET Account_pin=%d WHERE Account_no=%d",acc_pin,Integer.parseInt(acc_number)));connect.commit();
+            System.out.println("Pin updated!!");}
+        catch (Exception e) {
+            try {
+                connect.rollback();
+                return false;
+            } catch (SQLException ex) {
+                System.out.println(e.getMessage());
+                return false;
+            }
+        }
+        return true;
+    }
 }
