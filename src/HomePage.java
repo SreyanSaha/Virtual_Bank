@@ -7,14 +7,15 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 public class HomePage extends JFrame implements ActionListener, MouseListener {
-    protected static boolean verify_details=false,verify_opin=false;
-    private static JButton log_out,deposit,change_pin,mini,dash_b,statement,change_pass,send_money,verify_ben,ini_tb,cancle_but,proceed_but,verify_opin_but,c_pin;
+    protected static boolean verify_details=false,verify_opin=false,verify_opass=false;
+    private static JButton log_out,deposit,change_pin,mini,dash_b,statement,change_pass,verify_ben,ini_tb,cancle_but,proceed_but,verify_opin_but,c_pin,ver_opass_but,c_pass;
     private static ArrayList<String>list,recent_list;
     private static JLayeredPane lp;
-    private static JPanel dash_pan,deposite_pan,pin_pan,change_pin_pan;
+    private static JPanel dash_pan,deposite_pan,pin_pan,change_pin_pan,change_pass_pan;
     private static JTextField source_acct,beni_acct,beni_namet,amount_sendt;
-    private static JLabel ver_ben_msg,cannot_transfer,transaction_details,transaction_details2,transfer_failed,chances,status,ver_old_pin,pin_update_status;
-    private static JPasswordField transfer_pin,old_pin,new_pin,con_new_pin;
+    private static JLabel ver_ben_msg,cannot_transfer,transaction_details,transaction_details2,transfer_failed,chances,status,ver_old_pin,pin_update_status,ver_old_pass,pass_update_status;
+    private static JPasswordField transfer_pin,old_pin,new_pin,con_new_pin,old_pass,new_pass,con_new_pass;
+    private static JCheckBox reveal;
     private static Home_details details;
     private static int dr_cr=0,s_acc,b_acc;
     private String account_no;
@@ -110,13 +111,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         change_pass.setBounds(35,610,200,40);
         change_pass.setFont(new Font("long Island",Font.PLAIN,20));
         change_pass.addMouseListener(this);
-        send_money=new JButton("Send Money");
-        send_money.setBackground(Color.WHITE);
-        send_money.setFocusable(false);
-        send_money.setForeground(Color.BLACK);
-        send_money.setBounds(35,710,200,40);
-        send_money.setFont(new Font("long Island",Font.PLAIN,20));
-        send_money.addMouseListener(this);
 
         deposit.setVisible(true);
         deposit.addActionListener(this);
@@ -132,8 +126,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         statement.addActionListener(this);
         change_pass.setVisible(true);
         change_pass.addActionListener(this);
-        send_money.setVisible(true);
-        send_money.addActionListener(this);
 
         this.setVisible(true);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -154,7 +146,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         panel2.add(mini);
         panel2.add(statement);
         panel2.add(change_pass);
-        panel2.add(send_money);
         this.add(panel2);
         this.add(panel);
         this.add(lp);
@@ -182,7 +173,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
             dash_b.setEnabled(true);
             statement.setEnabled(true);
             change_pass.setEnabled(true);
-            send_money.setEnabled(true);
             lp.removeAll();
             lp.add(deposit_pan());
         }
@@ -193,7 +183,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
             dash_b.setEnabled(true);
             statement.setEnabled(true);
             change_pass.setEnabled(true);
-            send_money.setEnabled(true);
             lp.removeAll();
             lp.add(getChange_pin_pan());
         }
@@ -204,7 +193,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
             dash_b.setEnabled(true);
             statement.setEnabled(true);
             change_pass.setEnabled(true);
-            send_money.setEnabled(true);
         }
         else if (e.getSource()==dash_b) {
             deposit.setEnabled(true);
@@ -213,7 +201,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
             dash_b.setEnabled(false);
             statement.setEnabled(true);
             change_pass.setEnabled(true);
-            send_money.setEnabled(true);
             details.fetch_dashboard_details(list);
             lp.removeAll();
             lp.add(dash_pan());
@@ -225,7 +212,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
             dash_b.setEnabled(true);
             statement.setEnabled(false);
             change_pass.setEnabled(true);
-            send_money.setEnabled(true);
         }
         else if (e.getSource()==change_pass) {
             deposit.setEnabled(true);
@@ -234,16 +220,8 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
             dash_b.setEnabled(true);
             statement.setEnabled(true);
             change_pass.setEnabled(false);
-            send_money.setEnabled(true);
-        }
-        else if(e.getSource()==send_money){
-            deposit.setEnabled(true);
-            change_pin.setEnabled(true);
-            mini.setEnabled(true);
-            dash_b.setEnabled(true);
-            statement.setEnabled(true);
-            change_pass.setEnabled(true);
-            send_money.setEnabled(false);
+            lp.removeAll();
+            lp.add(getChange_pass_pan());
         }
         else if(e.getSource()==ini_tb){
             if(verify_details&&details.verify_transfer_amount(amount_sendt.getText())){
@@ -253,7 +231,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
                 dash_b.setEnabled(false);
                 statement.setEnabled(false);
                 change_pass.setEnabled(false);
-                send_money.setEnabled(false);
                 lp.removeAll();
                 lp.add(pin_pan());
             }
@@ -274,7 +251,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
             dash_b.setEnabled(false);
             statement.setEnabled(true);
             change_pass.setEnabled(true);
-            send_money.setEnabled(true);
             details.fetch_dashboard_details(list);
             lp.removeAll();
             lp.add(dash_pan());
@@ -294,7 +270,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
                     dash_b.setEnabled(true);
                     statement.setEnabled(true);
                     change_pass.setEnabled(true);
-                    send_money.setEnabled(true);
                     lp.removeAll();
                     lp.add(deposit_pan());
                 }
@@ -324,12 +299,12 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         }
         else if(e.getSource()==c_pin){
             if(!verify_opin){
-                pin_update_status.setText("X Complete Old Pin Verification");
+                pin_update_status.setText("X Complete Verification");
                 pin_update_status.setForeground(Color.RED);
                 pin_update_status.setVisible(true);
             }
             else if(!details.verify_new_pin(String.valueOf(new_pin.getPassword()),String.valueOf(con_new_pin.getPassword()))){
-                pin_update_status.setText("X Not Equal");
+                pin_update_status.setText("X Pin Not Equal");
                 pin_update_status.setForeground(Color.RED);
                 pin_update_status.setVisible(true);
             }
@@ -343,6 +318,44 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
                 pin_update_status.setForeground(Color.GREEN);
                 pin_update_status.setVisible(true);
                 c_pin.setEnabled(false);
+            }
+        }
+        else if(e.getSource()==ver_opass_but){
+            verify_opass=details.verify_old_pass(String.valueOf(old_pass.getPassword()));
+            if(verify_opass){
+                ver_opass_but.setEnabled(false);
+                ver_old_pass.setText("✓ Password Verified");
+                ver_old_pass.setForeground(Color.GREEN);
+                ver_old_pass.setVisible(true);
+            }
+            else{
+                ver_opass_but.setEnabled(true);
+                ver_old_pass.setForeground(Color.RED);
+                ver_old_pass.setText("X Invalid Password");
+                ver_old_pass.setVisible(true);
+            }
+        }
+        else if(e.getSource()==c_pass){
+            if(!verify_opass){
+                pass_update_status.setText("X Complete Verification");
+                pass_update_status.setForeground(Color.RED);
+                pass_update_status.setVisible(true);
+            }
+            else if(!details.verify_new_pass(String.valueOf(new_pass.getPassword()),String.valueOf(con_new_pass.getPassword()))){
+                pass_update_status.setText("X Password Not Equal");
+                pass_update_status.setForeground(Color.RED);
+                pass_update_status.setVisible(true);
+            }
+            else if(!details.update_new_pass()){
+                pass_update_status.setText("X Password cannot be updated");
+                pass_update_status.setForeground(Color.RED);
+                pass_update_status.setVisible(true);
+            }
+            else{
+                pass_update_status.setText("✓ Password Updated");
+                pass_update_status.setForeground(Color.GREEN);
+                pass_update_status.setVisible(true);
+                c_pass.setEnabled(false);
             }
         }
     }
@@ -403,9 +416,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         else if (e.getSource()==change_pass) {
             change_pass.setBackground(Color.RED);
         }
-        else if(e.getSource()==send_money){
-            send_money.setBackground(Color.RED);
-        }
         else if (e.getSource()==verify_ben) {
             verify_ben.setBackground(Color.RED);
             verify_ben.setForeground(Color.WHITE);
@@ -422,7 +432,14 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
             c_pin.setForeground(Color.WHITE);
             c_pin.setBackground(Color.RED);
         }
-
+        else if(e.getSource()==ver_opass_but){
+            ver_opass_but.setForeground(Color.WHITE);
+            ver_opass_but.setBackground(Color.RED);
+        }
+        else if(e.getSource()==c_pass){
+            c_pass.setForeground(Color.WHITE);
+            c_pass.setBackground(Color.RED);
+        }
     }
 
     @Override
@@ -448,9 +465,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         else if (e.getSource()==change_pass) {
             change_pass.setBackground(Color.WHITE);
         }
-        else if(e.getSource()==send_money){
-            send_money.setBackground(Color.WHITE);
-        }
         else if (e.getSource()==verify_ben) {
             verify_ben.setBackground(Color.WHITE);
             verify_ben.setForeground(Color.BLACK);
@@ -466,6 +480,14 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         else if(e.getSource()==c_pin){
             c_pin.setForeground(Color.BLACK);
             c_pin.setBackground(Color.WHITE);
+        }
+        else if(e.getSource()==ver_opass_but){
+            ver_opass_but.setForeground(Color.BLACK);
+            ver_opass_but.setBackground(Color.WHITE);
+        }
+        else if(e.getSource()==c_pass){
+            c_pass.setForeground(Color.BLACK);
+            c_pass.setBackground(Color.WHITE);
         }
     }
 
@@ -806,7 +828,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         opin.setForeground(Color.RED);
         opin.setVisible(true);
 
-        JLabel eopin=new JLabel("Old pin:");
+        JLabel eopin=new JLabel("Old Pin:");
         eopin.setBounds(50,100,200,100);
         eopin.setFont(new Font("long Island",Font.PLAIN,30));
         eopin.setForeground(Color.WHITE);
@@ -855,7 +877,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         new_pin.addMouseListener(this);
         new_pin.setVisible(true);
 
-        JLabel conpin=new JLabel("Conform New Pin:");
+        JLabel conpin=new JLabel("Confirm New Pin:");
         conpin.setBounds(50,420,300,100);
         conpin.setFont(new Font("long Island",Font.PLAIN,30));
         conpin.setForeground(Color.WHITE);
@@ -869,7 +891,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         con_new_pin.addMouseListener(this);
         con_new_pin.setVisible(true);
 
-        c_pin=new JButton("Change");
+        c_pin=new JButton("Update");
         c_pin.setBackground(Color.WHITE);
         c_pin.setFocusable(false);
         c_pin.setBounds(310,510,120,40);
@@ -898,6 +920,118 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         cpin_contents.add(pin_update_status);
         change_pin_pan.add(cpin_contents);
         return change_pin_pan;
+    }
+    private JPanel getChange_pass_pan(){
+        change_pass_pan=new JPanel();
+        change_pass_pan.setBounds(282,132,1920,1080);
+        change_pass_pan.setBackground(Color.GRAY);
+        change_pass_pan.setLayout(null);
+        change_pass_pan.setVisible(true);
+
+        JPanel cpass_contents=new JPanel();
+        cpass_contents.setBounds(30,30,1580,820);
+        cpass_contents.setBackground(new Color(0,35,100));
+        cpass_contents.setLayout(null);
+        cpass_contents.setVisible(true);
+
+        JLabel opas=new JLabel("Enter Your Old Password.");
+        opas.setBounds(50,10,1920,100);
+        opas.setFont(new Font("long Island",Font.BOLD,50));
+        opas.setForeground(Color.RED);
+        opas.setVisible(true);
+
+        JLabel eopas=new JLabel("Old Password:");
+        eopas.setBounds(50,100,200,100);
+        eopas.setFont(new Font("long Island",Font.PLAIN,30));
+        eopas.setForeground(Color.WHITE);
+        eopas.setVisible(true);
+
+        old_pass=new JPasswordField();
+        old_pass.setBounds(245,132,400,40);
+        old_pass.setForeground(Color.RED);
+        old_pass.setBackground(Color.WHITE);
+        old_pass.setFont(new Font("Long Island",Font.PLAIN,30));
+        old_pass.addMouseListener(this);
+        old_pass.setVisible(true);
+
+        ver_old_pass=new JLabel("✓ Pin verified");
+        ver_old_pass.setForeground(Color.GREEN);
+        ver_old_pass.setBounds(345,195,300,30);
+        ver_old_pass.setFont(new Font("Long Island",Font.PLAIN,20));
+        ver_old_pass.setVisible(false);
+
+        ver_opass_but=new JButton("Verify");
+        ver_opass_but.setBackground(Color.WHITE);
+        ver_opass_but.setFocusable(false);
+        ver_opass_but.setBounds(245,192,90,40);
+        ver_opass_but.setFont(new Font("long Island",Font.PLAIN,20));
+        ver_opass_but.setVisible(true);
+        ver_opass_but.addActionListener(this);
+        ver_opass_but.addMouseListener(this);
+
+        JLabel newpas=new JLabel("Enter New Password.");
+        newpas.setBounds(50,250,1920,100);
+        newpas.setFont(new Font("long Island",Font.BOLD,50));
+        newpas.setForeground(Color.RED);
+        newpas.setVisible(true);
+
+        JLabel enewpas=new JLabel("New Password:");
+        enewpas .setBounds(50,330,300,100);
+        enewpas.setFont(new Font("long Island",Font.PLAIN,30));
+        enewpas.setForeground(Color.WHITE);
+        enewpas.setVisible(true);
+
+        new_pass=new JPasswordField();
+        new_pass.setBounds(370,362,400,40);
+        new_pass.setForeground(Color.RED);
+        new_pass.setBackground(Color.WHITE);
+        new_pass.setFont(new Font("Long Island",Font.PLAIN,30));
+        new_pass.addMouseListener(this);
+        new_pass.setVisible(true);
+
+        JLabel conpas=new JLabel("Confirm New Password:");
+        conpas.setBounds(50,420,400,100);
+        conpas.setFont(new Font("long Island",Font.PLAIN,30));
+        conpas.setForeground(Color.WHITE);
+        conpas.setVisible(true);
+
+        con_new_pass=new JPasswordField();
+        con_new_pass.setBounds(370,450,400,40);
+        con_new_pass.setForeground(Color.RED);
+        con_new_pass.setBackground(Color.WHITE);
+        con_new_pass.setFont(new Font("Long Island",Font.PLAIN,30));
+        con_new_pass.addMouseListener(this);
+        con_new_pass.setVisible(true);
+
+        c_pass=new JButton("Update");
+        c_pass.setBackground(Color.WHITE);
+        c_pass.setFocusable(false);
+        c_pass.setBounds(370,510,120,40);
+        c_pass.setFont(new Font("long Island",Font.PLAIN,20));
+        c_pass.setVisible(true);
+        c_pass.addActionListener(this);
+        c_pass.addMouseListener(this);
+
+        pass_update_status=new JLabel("✓ Pin Changed");
+        pass_update_status.setForeground(Color.GREEN);
+        pass_update_status.setBounds(500,515,300,30);
+        pass_update_status.setFont(new Font("Long Island",Font.PLAIN,20));
+        pass_update_status.setVisible(false);
+
+        cpass_contents.add(opas);
+        cpass_contents.add(eopas);
+        cpass_contents.add(newpas);
+        cpass_contents.add(enewpas);
+        cpass_contents.add(conpas);
+        cpass_contents.add(old_pass);
+        cpass_contents.add(new_pass);
+        cpass_contents.add(con_new_pass);
+        cpass_contents.add(ver_old_pass);
+        cpass_contents.add(ver_opass_but);
+        cpass_contents.add(c_pass);
+        cpass_contents.add(pass_update_status);
+        change_pass_pan.add(cpass_contents);
+        return change_pass_pan;
     }
     private static ArrayList<String> get_object_of_list(){return new ArrayList<>();}
     private static ArrayList<String> get_obj_of_recent_list(){return new ArrayList<>();}
@@ -940,4 +1074,5 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         ver_ben_msg.setForeground(Color.GREEN);
         return true;
     }
+    private static void show_hidden_pass(){}
 }

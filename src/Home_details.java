@@ -11,7 +11,7 @@ public class Home_details {
     private static double bal1,bal2;
     private static int acc_pin;
     private static double amt_send;
-    private String s_name,b_name;
+    private static String s_name,b_name,acc_pass;
     Home_details(String acc_number){
         this.acc_number=acc_number;
         try{connect=DriverManager.getConnection(url,uname,pass);statement1=connect.createStatement();connect.setAutoCommit(false);}
@@ -194,6 +194,37 @@ public class Home_details {
                 connect.rollback();
                 return false;
             } catch (SQLException ex) {
+                System.out.println(e.getMessage());
+                return false;
+            }
+        }
+        return true;
+    }
+    protected boolean verify_old_pass(String p){
+        if(p.isEmpty()){return false;}
+        try{
+            ResultSet res=statement1.executeQuery(String.format("SELECT Holder_password FROM BANK_DETAILS WHERE Account_no=%d",Integer.parseInt(acc_number)));
+            if(res.next()){return p.equals(res.getString("Holder_password"));}
+            else return false;
+        }
+        catch (SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return false;
+    }
+    protected boolean verify_new_pass(String pass1,String pass2){if(pass1.length()>30||pass2.length()>30){return false;}acc_pass=pass1;return pass1.equals(pass2);}
+    protected boolean update_new_pass(){
+        try{
+            statement1.execute(String.format("UPDATE BANK_DETAILS SET Holder_password='%s' WHERE Account_no=%d",acc_pass,Integer.parseInt(acc_number)));connect.commit();
+            System.out.println("Pass updated!");
+        }
+        catch (SQLException e){
+            System.out.println(e.getMessage());
+            try{
+                connect.rollback();
+                return false;
+            }
+            catch (SQLException ex){
                 System.out.println(e.getMessage());
                 return false;
             }
