@@ -8,14 +8,13 @@ import java.util.ArrayList;
 
 public class HomePage extends JFrame implements ActionListener, MouseListener {
     protected static boolean verify_details=false,verify_opin=false,verify_opass=false;
-    private static JButton log_out,deposit,change_pin,mini,dash_b,statement,change_pass,verify_ben,ini_tb,cancle_but,proceed_but,verify_opin_but,c_pin,ver_opass_but,c_pass;
+    private static JButton log_out,deposit,change_pin,mini,dash_b,statement,change_pass,verify_ben,ini_tb,cancel_but,proceed_but,verify_opin_but,c_pin,ver_opass_but,c_pass,show_but;
     private static ArrayList<String>list,recent_list;
     private static JLayeredPane lp;
     private static JPanel dash_pan,deposite_pan,pin_pan,change_pin_pan,change_pass_pan;
     private static JTextField source_acct,beni_acct,beni_namet,amount_sendt;
     private static JLabel ver_ben_msg,cannot_transfer,transaction_details,transaction_details2,transfer_failed,chances,status,ver_old_pin,pin_update_status,ver_old_pass,pass_update_status;
     private static JPasswordField transfer_pin,old_pin,new_pin,con_new_pin,old_pass,new_pass,con_new_pass;
-    private static JCheckBox reveal;
     private static Home_details details;
     private static int dr_cr=0,s_acc,b_acc;
     private String account_no;
@@ -244,7 +243,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
                 cannot_transfer.setVisible(true);
             }
         }
-        else if (e.getSource()==cancle_but) {
+        else if (e.getSource()==cancel_but) {
             deposit.setEnabled(true);
             change_pin.setEnabled(true);
             mini.setEnabled(true);
@@ -358,6 +357,18 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
                 c_pass.setEnabled(false);
             }
         }
+        else if(e.getSource()==show_but){
+            if(show_but.getText().equals("Show")){
+                show_but.setText("Hide");
+                new_pass.setEchoChar((char)0);
+                con_new_pass.setEchoChar((char)0);
+            }
+            else{
+                show_but.setText("Show");
+                new_pass.setEchoChar('●');
+                con_new_pass.setEchoChar('●');
+            }
+        }
     }
 
     @Override
@@ -440,6 +451,10 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
             c_pass.setForeground(Color.WHITE);
             c_pass.setBackground(Color.RED);
         }
+        else if(e.getSource()==show_but){
+            show_but.setForeground(Color.WHITE);
+            show_but.setBackground(Color.RED);
+        }
     }
 
     @Override
@@ -488,6 +503,10 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         else if(e.getSource()==c_pass){
             c_pass.setForeground(Color.BLACK);
             c_pass.setBackground(Color.WHITE);
+        }
+        else if(e.getSource()==show_but){
+            show_but.setForeground(Color.BLACK);
+            show_but.setBackground(Color.WHITE);
         }
     }
 
@@ -787,15 +806,15 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         proceed_but.addActionListener(this);
         proceed_but.addMouseListener(this);
 
-        cancle_but=new JButton("Cancel");
-        cancle_but.setBackground(Color.RED);
-        cancle_but.setForeground(Color.BLACK);
-        cancle_but.setFocusable(false);
-        cancle_but.setBounds(450,420,120,40);
-        cancle_but.setFont(new Font("long Island",Font.PLAIN,20));
-        cancle_but.setVisible(true);
-        cancle_but.addActionListener(this);
-        cancle_but.addMouseListener(this);
+        cancel_but=new JButton("Cancel");
+        cancel_but.setBackground(Color.RED);
+        cancel_but.setForeground(Color.BLACK);
+        cancel_but.setFocusable(false);
+        cancel_but.setBounds(450,420,120,40);
+        cancel_but.setFont(new Font("long Island",Font.PLAIN,20));
+        cancel_but.setVisible(true);
+        cancel_but.addActionListener(this);
+        cancel_but.addMouseListener(this);
 
         pin_pan_contents.add(chances);
         pin_pan_contents.add(transfer_pin);
@@ -805,7 +824,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         pin_pan_contents.add(actno);
         pin_pan_contents.add(status);
         pin_pan_contents.add(proceed_but);
-        pin_pan_contents.add(cancle_but);
+        pin_pan_contents.add(cancel_but);
         pin_pan.add(pin_pan_contents);
         return pin_pan;
     }
@@ -1003,6 +1022,15 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         con_new_pass.addMouseListener(this);
         con_new_pass.setVisible(true);
 
+        show_but=new JButton("Show");
+        show_but.setBackground(Color.WHITE);
+        show_but.setFocusable(false);
+        show_but.setBounds(800,455,90,30);
+        show_but.setFont(new Font("long Island",Font.PLAIN,20));
+        show_but.setVisible(true);
+        show_but.addActionListener(this);
+        show_but.addMouseListener(this);
+
         c_pass=new JButton("Update");
         c_pass.setBackground(Color.WHITE);
         c_pass.setFocusable(false);
@@ -1029,6 +1057,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         cpass_contents.add(ver_old_pass);
         cpass_contents.add(ver_opass_but);
         cpass_contents.add(c_pass);
+        cpass_contents.add(show_but);
         cpass_contents.add(pass_update_status);
         change_pass_pan.add(cpass_contents);
         return change_pass_pan;
@@ -1074,5 +1103,4 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         ver_ben_msg.setForeground(Color.GREEN);
         return true;
     }
-    private static void show_hidden_pass(){}
 }
