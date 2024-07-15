@@ -11,7 +11,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
     private static JButton log_out,deposit,change_pin,mini,dash_b,statement,change_pass,verify_ben,ini_tb,cancel_but,proceed_but,verify_opin_but,c_pin,ver_opass_but,c_pass,show_but;
     private static ArrayList<String>list,recent_list;
     private static JLayeredPane lp;
-    private static JPanel dash_pan,deposite_pan,pin_pan,change_pin_pan,change_pass_pan;
+    private static JPanel dash_pan,deposite_pan,pin_pan,change_pin_pan,change_pass_pan,statement_pan;
     private static JTextField source_acct,beni_acct,beni_namet,amount_sendt;
     private static JLabel ver_ben_msg,cannot_transfer,transaction_details,transaction_details2,transfer_failed,chances,status,ver_old_pin,pin_update_status,ver_old_pass,pass_update_status;
     private static JPasswordField transfer_pin,old_pin,new_pin,con_new_pin,old_pass,new_pass,con_new_pass;
@@ -192,6 +192,8 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
             dash_b.setEnabled(true);
             statement.setEnabled(true);
             change_pass.setEnabled(true);
+            lp.removeAll();
+            lp.add(getStatement_pan());
         }
         else if (e.getSource()==dash_b) {
             deposit.setEnabled(true);
@@ -230,6 +232,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
                 dash_b.setEnabled(false);
                 statement.setEnabled(false);
                 change_pass.setEnabled(false);
+                verify_details=false;
                 lp.removeAll();
                 lp.add(pin_pan());
             }
@@ -317,6 +320,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
                 pin_update_status.setForeground(Color.GREEN);
                 pin_update_status.setVisible(true);
                 c_pin.setEnabled(false);
+                verify_opin=false;
             }
         }
         else if(e.getSource()==ver_opass_but){
@@ -355,6 +359,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
                 pass_update_status.setForeground(Color.GREEN);
                 pass_update_status.setVisible(true);
                 c_pass.setEnabled(false);
+                verify_opass=false;
             }
         }
         else if(e.getSource()==show_but){
@@ -1061,6 +1066,38 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         cpass_contents.add(pass_update_status);
         change_pass_pan.add(cpass_contents);
         return change_pass_pan;
+    }
+    private JPanel getStatement_pan(){
+        statement_pan=new JPanel();
+        statement_pan.setBounds(282,132,1920,1080);
+        statement_pan.setBackground(Color.GRAY);
+        statement_pan.setLayout(null);
+        statement_pan.setVisible(true);
+
+        JPanel statement_contents=new JPanel();
+        statement_contents.setBounds(30,30,1580,820);
+        statement_contents.setBackground(new Color(0,35,100));
+        statement_contents.setLayout(null);
+        statement_contents.setVisible(true);
+
+        JLabel column=new JLabel("<html>"+"Account"+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+"Name"+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+"Amount"+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+"Balance"+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+"Date & Time"+"<hr>"+"</html>");
+        column.setBounds(300,30,1200,100);
+        column.setFont(new Font("long Island",Font.BOLD,35));
+        column.setForeground(Color.RED);
+        column.setVisible(true);
+
+        JLabel transaction=new JLabel();
+        transaction.setBounds(30,40,1580,700);
+        transaction.setFont(new Font("long Island",Font.PLAIN,30));
+        transaction.setForeground(Color.WHITE);
+        transaction.setVisible(true);
+
+        details.get_all_10_transactions(transaction);
+
+        statement_contents.add(transaction);
+        statement_contents.add(column);
+        statement_pan.add(statement_contents);
+        return statement_pan;
     }
     private static ArrayList<String> get_object_of_list(){return new ArrayList<>();}
     private static ArrayList<String> get_obj_of_recent_list(){return new ArrayList<>();}

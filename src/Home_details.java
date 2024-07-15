@@ -231,4 +231,32 @@ public class Home_details {
         }
         return true;
     }
+    protected void get_all_10_transactions(JLabel transaction){
+        try {
+            int last=0;
+            ResultSet res1=statement1.executeQuery(String.format("SELECT Sl_no FROM Transaction_%d order by Sl_no DESC",Integer.parseInt(acc_number)));
+            if(res1.next()){last=res1.getInt("Sl_no");}
+            ResultSet res=statement1.executeQuery(String.format("SELECT Account_no, Holder_fname, Amount, Balance, Dr, Tdate_Ttime FROM Transaction_%d WHERE Sl_no BETWEEN %d and %d", Integer.parseInt(acc_number),(last-9),last));
+            while(res.next()){
+                transaction.removeAll();
+                if(res.getInt("Dr")==1){
+                    transaction.setText(transaction.getText()+"<html>"+"⭧ Paid To:"+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+"XXXX"+Integer.toString(res.getInt("Account_no")).substring(4)+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
+                            res.getString("Holder_fname")+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
+                            res.getDouble("Amount")+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
+                            res.getDouble("Balance")+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
+                            res.getTimestamp("Tdate_Ttime")+
+                            "<br><hr><html>");
+                }
+                else{
+                    transaction.setText(transaction.getText()+"<html>"+"⭩ Received from:"+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+"XXXX"+Integer.toString(res.getInt("Account_no")).substring(4)+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
+                            res.getString("Holder_fname")+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
+                            res.getDouble("Amount")+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
+                            res.getDouble("Balance")+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+
+                            res.getTimestamp("Tdate_Ttime")+
+                            "<br><hr><html>");
+                }
+            }
+        }
+        catch (SQLException e){System.out.println(e.getMessage());}
+    }
 }
