@@ -778,7 +778,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
 
         chances=new JLabel("Invalid Pin!");
         chances.setBounds(820,325,500,100);
-        chances.setFont(new Font("long Island",Font.PLAIN,25));
+        chances.setFont(new Font("long Island",Font.BOLD,25));
         chances.setForeground(Color.RED);
         chances.setVisible(false);
 
@@ -864,7 +864,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         ver_old_pin=new JLabel("✓ Pin verified");
         ver_old_pin.setForeground(Color.GREEN);
         ver_old_pin.setBounds(260,195,300,30);
-        ver_old_pin.setFont(new Font("Long Island",Font.PLAIN,20));
+        ver_old_pin.setFont(new Font("Long Island",Font.BOLD,20));
         ver_old_pin.setVisible(false);
 
         verify_opin_but=new JButton("Verify");
@@ -922,7 +922,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         pin_update_status=new JLabel("✓ Pin Changed");
         pin_update_status.setForeground(Color.GREEN);
         pin_update_status.setBounds(440,515,300,30);
-        pin_update_status.setFont(new Font("Long Island",Font.PLAIN,20));
+        pin_update_status.setFont(new Font("Long Island",Font.BOLD,20));
         pin_update_status.setVisible(false);
 
         cpin_contents.add(opin);
@@ -976,7 +976,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         ver_old_pass=new JLabel("✓ Pin verified");
         ver_old_pass.setForeground(Color.GREEN);
         ver_old_pass.setBounds(345,195,300,30);
-        ver_old_pass.setFont(new Font("Long Island",Font.PLAIN,20));
+        ver_old_pass.setFont(new Font("Long Island",Font.BOLD,20));
         ver_old_pass.setVisible(false);
 
         ver_opass_but=new JButton("Verify");
@@ -1043,7 +1043,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         pass_update_status=new JLabel("✓ Pin Changed");
         pass_update_status.setForeground(Color.GREEN);
         pass_update_status.setBounds(500,515,300,30);
-        pass_update_status.setFont(new Font("Long Island",Font.PLAIN,20));
+        pass_update_status.setFont(new Font("Long Island",Font.BOLD,20));
         pass_update_status.setVisible(false);
 
         cpass_contents.add(opas);
