@@ -7,16 +7,17 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 public class HomePage extends JFrame implements ActionListener, MouseListener {
-    protected static boolean verify_details=false,verify_opin=false,verify_opass=false;
-    private static JButton log_out,deposit,change_pin,mini,dash_b,statement,change_pass,verify_ben,ini_tb,cancel_but,proceed_but,verify_opin_but,c_pin,ver_opass_but,c_pass,show_but;
+    protected static boolean verify_details=false,verify_opin=false,verify_opass=false,cur_path=false;
+    private static JButton log_out,deposit,change_pin,mini,dash_b,statement,change_pass,verify_ben,ini_tb,cancel_but,proceed_but,verify_opin_but,c_pin,ver_opass_but,c_pass,show_but,ch_file_but,save_pdf_but,about;
     private static ArrayList<String>list,recent_list;
     private static JLayeredPane lp;
-    private static JPanel dash_pan,deposite_pan,pin_pan,change_pin_pan,change_pass_pan,statement_pan;
+    private static JPanel dash_pan,deposite_pan,pin_pan,change_pin_pan,change_pass_pan,statement_pan,full_statement_pan;
     private static JTextField source_acct,beni_acct,beni_namet,amount_sendt;
-    private static JLabel ver_ben_msg,cannot_transfer,transaction_details,transaction_details2,transfer_failed,chances,status,ver_old_pin,pin_update_status,ver_old_pass,pass_update_status;
+    private static JLabel ver_ben_msg,cannot_transfer,transaction_details,transaction_details2,transfer_failed,chances,status,ver_old_pin,pin_update_status,ver_old_pass,pass_update_status,path_status;
     private static JPasswordField transfer_pin,old_pin,new_pin,con_new_pin,old_pass,new_pass,con_new_pass;
     private static Home_details details;
     private static int dr_cr=0,s_acc,b_acc;
+    private static JTextField path;
     private String account_no;
     protected HomePage(String account_no){
         this.account_no=account_no;
@@ -42,21 +43,19 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         panel2.setLayout(null);
         panel2.setVisible(true);
 
-        JLabel label=new JLabel();
-        label.setText("Virtual");
+        JLabel label=new JLabel("Virtual");
         label.setFont(new Font("long Island",Font.BOLD,40));
         label.setBounds(20,25,200,100);
         label.setForeground(Color.RED);
         label.setVisible(true);
 
-        JLabel label2=new JLabel();
-        label2.setText("Bank");
+        JLabel label2=new JLabel("Bank");
         label2.setFont(new Font("long Island",Font.BOLD,40));
         label2.setBounds(150,25,200,100);
         label2.setForeground(new Color(0,0,100));
         label2.setVisible(true);
 
-        ImageIcon image2 = new ImageIcon("E:\\JDBC_programming\\JDBC_project\\src\\vb_nobg.png");
+        ImageIcon image2 = new ImageIcon("src/vb_nobg.png");
         JLabel label3=new JLabel();
         label3.setIcon(image2);
         label3.setBounds(730,20,450,100);
@@ -130,11 +129,21 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setSize(1920, 1080);
         this.setTitle("Virtual Bank");
-        ImageIcon image = new ImageIcon("E:\\JDBC_programming\\JDBC_project\\src\\vb.jpg");
+        ImageIcon image = new ImageIcon("src/vb.jpg");
         this.setIconImage(image.getImage());
         this.getContentPane().setBackground(Color.BLACK);
         this.setLayout(null);
         setExtendedState(MAXIMIZED_BOTH);
+
+        about=new JButton("About");
+        about.setBackground(Color.WHITE);
+        about.setFocusable(false);
+        about.setForeground(Color.BLACK);
+        about.setBounds(35,800,100,40);
+        about.setFont(new Font("long Island",Font.PLAIN,20));
+        about.addMouseListener(this);
+        about.addActionListener(this);
+
         panel.add(log_out);
         panel.add(label);
         panel.add(label2);
@@ -145,6 +154,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         panel2.add(mini);
         panel2.add(statement);
         panel2.add(change_pass);
+        panel2.add(about);
         this.add(panel2);
         this.add(panel);
         this.add(lp);
@@ -213,6 +223,8 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
             dash_b.setEnabled(true);
             statement.setEnabled(false);
             change_pass.setEnabled(true);
+            lp.removeAll();
+            lp.add(getFull_statement_pan());
         }
         else if (e.getSource()==change_pass) {
             deposit.setEnabled(true);
@@ -263,7 +275,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
                 status.setText("Processing...");
                 status.setForeground(Color.GREEN);
                 transfer_pin.setEnabled(false);
-                if(details.initiate_transfer(status,transfer_pin,s_acc,b_acc)){
+                if(details.initiate_transfer(s_acc,b_acc)){
                    status.setText("Transaction Successful...");
                     JOptionPane.showConfirmDialog(this,"Transaction Successful","Transaction Status",JOptionPane.PLAIN_MESSAGE,JOptionPane.CLOSED_OPTION);
                     deposit.setEnabled(false);
@@ -374,6 +386,39 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
                 con_new_pass.setEchoChar('●');
             }
         }
+        else if(e.getSource()==ch_file_but){
+            path_status.setVisible(false);
+            cur_path=details.get_path(path);
+            if(!cur_path){
+                path_status.setVisible(true);
+                path_status.setForeground(Color.RED);
+                path_status.setText("X Path Not Selected");
+            }
+            else{
+                path_status.setVisible(true);
+                path_status.setForeground(Color.GREEN);
+                path_status.setText("✓ Path Selected");
+            }
+        }
+        else if(e.getSource()==save_pdf_but){
+            if(!cur_path||!details.create_pdf()){
+                JOptionPane.showConfirmDialog(this,"Pdf not generated","Pdf Status", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+            }
+            else{cur_path=false;JOptionPane.showConfirmDialog(this,"Pdf Generated","Pdf Status", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);}
+        }
+        else if(e.getSource()==about){
+            JOptionPane.showConfirmDialog(this, """
+                    Virtual Bank is a Banking application which is solely developed by me,
+                    Sreyan Saha. I am a student of BCA department at Techno Main Kolkata.
+                    I learned all required topics to develop this project like JDBC and Swing for GUI.
+                    As this is my first project which also has data base connectivity, there are a lot of missing features
+                    which will be added later. I started developing this project after my 3rd semester and I finally completed
+                    this after my 4th semester, reason of the delay is exams.
+                    At the end I would like to thank you for giving it a try. Also you can send your thought and reviews about
+                    this application via E-mail, at: sreyansaha6@gmail.com. 
+                   
+                    ""","About Developer", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+        }
     }
 
     @Override
@@ -460,6 +505,18 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
             show_but.setForeground(Color.WHITE);
             show_but.setBackground(Color.RED);
         }
+        else if(e.getSource()==ch_file_but){
+            ch_file_but.setForeground(Color.WHITE);
+            ch_file_but.setBackground(Color.RED);
+        }
+        else if(e.getSource()==save_pdf_but){
+            save_pdf_but.setForeground(Color.WHITE);
+            save_pdf_but.setBackground(Color.RED);
+        }
+        else if(e.getSource()==about){
+            about.setForeground(Color.WHITE);
+            about.setBackground(Color.RED);
+        }
     }
 
     @Override
@@ -512,6 +569,18 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         else if(e.getSource()==show_but){
             show_but.setForeground(Color.BLACK);
             show_but.setBackground(Color.WHITE);
+        }
+        else if(e.getSource()==ch_file_but){
+            ch_file_but.setForeground(Color.BLACK);
+            ch_file_but.setBackground(Color.WHITE);
+        }
+        else if(e.getSource()==save_pdf_but){
+            save_pdf_but.setForeground(Color.BLACK);
+            save_pdf_but.setBackground(Color.WHITE);
+        }
+        else if(e.getSource()==about){
+            about.setForeground(Color.BLACK);
+            about.setBackground(Color.WHITE);
         }
     }
 
@@ -636,8 +705,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         source_acct.setFont(new Font("Long Island",Font.PLAIN,25));
         source_acct.addMouseListener(this);
         source_acct.setVisible(true);
-
-
 
         JLabel source=new JLabel("Source Account: ");
         source.setBounds(50,100,1920,100);
@@ -1087,7 +1154,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         column.setVisible(true);
 
         JLabel transaction=new JLabel();
-        transaction.setBounds(30,40,1580,700);
+        transaction.setBounds(30,40,1580,620);
         transaction.setFont(new Font("long Island",Font.PLAIN,30));
         transaction.setForeground(Color.WHITE);
         transaction.setVisible(true);
@@ -1098,6 +1165,66 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         statement_contents.add(column);
         statement_pan.add(statement_contents);
         return statement_pan;
+    }
+    private JPanel getFull_statement_pan(){
+        full_statement_pan=new JPanel();
+        full_statement_pan.setBounds(282,132,1920,1080);
+        full_statement_pan.setBackground(Color.GRAY);
+        full_statement_pan.setLayout(null);
+        full_statement_pan.setVisible(true);
+
+        JPanel fstatement_contents=new JPanel();
+        fstatement_contents.setBounds(30,30,1580,820);
+        fstatement_contents.setBackground(new Color(0,35,100));
+        fstatement_contents.setLayout(null);
+        fstatement_contents.setVisible(true);
+
+        JLabel choose=new JLabel("Choose File Location:");
+        choose.setBounds(50,50,1920,100);
+        choose.setFont(new Font("long Island",Font.BOLD,50));
+        choose.setForeground(Color.RED);
+        choose.setVisible(true);
+
+        ch_file_but=new JButton("Browse");
+        ch_file_but.setBackground(Color.WHITE);
+        ch_file_but.setFocusable(false);
+        ch_file_but.setBounds(50,140,120,40);
+        ch_file_but.setFont(new Font("long Island",Font.PLAIN,20));
+        ch_file_but.setVisible(true);
+        ch_file_but.addActionListener(this);
+        ch_file_but.addMouseListener(this);
+
+        path=new JTextField();
+        path.setBounds(180,140,390,40);
+        path.setForeground(Color.RED);
+        path.setBackground(Color.WHITE);
+        path.setFont(new Font("Long Island",Font.PLAIN,25));
+        path.addMouseListener(this);
+        path.setVisible(true);
+        path.setEditable(false);
+
+        path_status=new JLabel("✓ Path Selected");
+        path_status.setForeground(Color.GREEN);
+        path_status.setBounds(580,145,300,30);
+        path_status.setFont(new Font("Long Island",Font.BOLD,20));
+        path_status.setVisible(false);
+
+        save_pdf_but=new JButton("Save");
+        save_pdf_but.setBackground(Color.WHITE);
+        save_pdf_but.setFocusable(false);
+        save_pdf_but.setBounds(180,200,120,40);
+        save_pdf_but.setFont(new Font("long Island",Font.PLAIN,20));
+        save_pdf_but.setVisible(true);
+        save_pdf_but.addActionListener(this);
+        save_pdf_but.addMouseListener(this);
+
+        fstatement_contents.add(choose);
+        fstatement_contents.add(ch_file_but);
+        fstatement_contents.add(path);
+        fstatement_contents.add(path_status);
+        fstatement_contents.add(save_pdf_but);
+        full_statement_pan.add(fstatement_contents);
+        return full_statement_pan;
     }
     private static ArrayList<String> get_object_of_list(){return new ArrayList<>();}
     private static ArrayList<String> get_obj_of_recent_list(){return new ArrayList<>();}

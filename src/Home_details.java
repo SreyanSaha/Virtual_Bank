@@ -1,4 +1,11 @@
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
 import javax.swing.*;
+import java.io.FileOutputStream;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -11,7 +18,7 @@ public class Home_details {
     private static double bal1,bal2;
     private static int acc_pin;
     private static double amt_send;
-    private static String s_name,b_name,acc_pass;
+    private String s_name,b_name,acc_pass,file_path;
     Home_details(String acc_number){
         this.acc_number=acc_number;
         try{connect=DriverManager.getConnection(url,uname,pass);statement1=connect.createStatement();connect.setAutoCommit(false);}
@@ -70,7 +77,7 @@ public class Home_details {
         catch (Exception e){System.out.println(e.getMessage());}
         return true;
     }
-    protected boolean initiate_transfer(JLabel status, JPasswordField transfer_pin,int s_acc,int b_acc){
+    protected boolean initiate_transfer(int s_acc,int b_acc){
         if(bal1-amt_send<0){return false;}
         String query_bank_update="UPDATE BANK_DETAILS SET Balance=? WHERE Account_no=?";
         String query_transaction_update="INSERT INTO Transaction_? (Account_no,Holder_fname,Amount,Balance,Dr,Cr) VALUES (?,?,?,?,?,?)";
@@ -258,5 +265,68 @@ public class Home_details {
             }
         }
         catch (SQLException e){System.out.println(e.getMessage());}
+    }
+    protected boolean get_path(JTextField path){
+        JFileChooser ch=new JFileChooser();
+        ch.setFocusable(false);
+        if(ch.showSaveDialog(null)==JFileChooser.APPROVE_OPTION){
+            this.file_path=ch.getSelectedFile().getAbsolutePath();
+            path.setText(file_path);
+        }
+        else{return false;}
+        return true;
+    }
+    protected boolean create_pdf(){
+        try {
+            file_path += ".pdf";
+            Document doc = new Document();
+            PdfWriter.getInstance(doc,new FileOutputStream(file_path));
+            doc.open();
+            doc.add(new Phrase("Virtual Bank"));
+            ResultSet result=statement1.executeQuery(String.format("SELECT * FROM BANK_DETAILS WHERE Account_no=%d",Integer.parseInt(acc_number)));
+            if(result.next()){doc.add(new Phrase(String.format("""
+                    
+                    Mr./Mrs. %s %s
+                    Account Number: %d
+                    """,result.getString("Holder_fname"),result.getString("Holder_lname"),result.getInt("Account_no"))));
+            }
+            PdfPTable table=new PdfPTable(6);
+            PdfPCell cell1=new PdfPCell(new Phrase("Account Number"));
+            table.addCell(cell1);
+            PdfPCell cell2=new PdfPCell(new Phrase("Name"));
+            table.addCell(cell2);
+            PdfPCell cell3=new PdfPCell(new Phrase("Debit"));
+            table.addCell(cell3);
+            PdfPCell cell4=new PdfPCell(new Phrase("Credit"));
+            table.addCell(cell4);
+            PdfPCell cell5=new PdfPCell(new Phrase("Balance"));
+            table.addCell(cell5);
+            PdfPCell cell6=new PdfPCell(new Phrase("Date & Time"));
+            table.addCell(cell6);
+            table.setHeaderRows(1);
+            ResultSet res=statement1.executeQuery(String.format("SELECT * FROM Transaction_%d",Integer.parseInt(acc_number)));
+            while (res.next()){
+                if(res.getInt("Dr")==1){
+                    table.addCell(String.valueOf(res.getInt("Account_no")));
+                    table.addCell(res.getString("Holder_fname"));
+                    table.addCell(String.valueOf(res.getDouble("Amount")));
+                    table.addCell(" ");
+                    table.addCell(String.valueOf(res.getDouble("Balance")));
+                    table.addCell(String.valueOf(res.getTimestamp("Tdate_Ttime")));
+                }
+                else{
+                    table.addCell(String.valueOf(res.getInt("Account_no")));
+                    table.addCell(res.getString("Holder_fname"));
+                    table.addCell(" ");
+                    table.addCell(String.valueOf(res.getDouble("Amount")));
+                    table.addCell(String.valueOf(res.getDouble("Balance")));
+                    table.addCell(String.valueOf(res.getTimestamp("Tdate_Ttime")));
+                }
+            }
+            doc.add(table);
+            doc.close();
+        }
+        catch (Exception e){System.out.println(e.getMessage());return false;}
+        return true;
     }
 }
