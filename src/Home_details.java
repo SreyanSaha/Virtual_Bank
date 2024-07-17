@@ -138,7 +138,7 @@ public class Home_details {
                 Timestamp ts=result.getTimestamp("Tdate_Ttime");
                 recent_list.add(ts.toString());
             }
-            else System.out.println("No transactions found!!");
+            else {System.out.println("No transactions found!!");dr_cr=3;}
         }
         catch (Exception e){System.out.println(e.getMessage());}
         return dr_cr;

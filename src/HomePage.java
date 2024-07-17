@@ -161,7 +161,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
     }
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource()==log_out){this.dispose();new FirstPage();}
+        if(e.getSource()==log_out){this.dispose();/*new FirstPage();*/}
         if(e.getSource()==verify_ben){
             cannot_transfer.setVisible(false);
             if(transfer_details_verify()){
@@ -644,22 +644,23 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         transaction_details.setVisible(true);
 
         dr_cr=details.get_recent_transaction(recent_list,dr_cr);
+        if(dr_cr!=3) {
+            transaction_details2 = new JLabel(String.format("%s  ₹%s  on  %s", recent_list.get(0), recent_list.get(1), recent_list.get(2)));
+            transaction_details2.setBounds(300, 480, 800, 100);
+            transaction_details2.setFont(new Font("long Island", Font.PLAIN, 30));
+            transaction_details2.setForeground(Color.WHITE);
+            transaction_details2.setVisible(true);
 
-        transaction_details2=new JLabel(String.format("%s  ₹%s  on  %s",recent_list.get(0),recent_list.get(1),recent_list.get(2)));
-        transaction_details2.setBounds(300,480,800,100);
-        transaction_details2.setFont(new Font("long Island",Font.PLAIN,30));
-        transaction_details2.setForeground(Color.WHITE);
-        transaction_details2.setVisible(true);
-
-        if(dr_cr==0){//dr==0,cr==1
-            transaction_details.setText("⭧ Paid To:");
-            transaction_details.setForeground(Color.RED);
-            transaction_details2.setBounds(220,480,800,100);
-        }
-        else{
-            transaction_details.setText("⭩ Received from:");
-            transaction_details.setForeground(Color.GREEN);
-            transaction_details2.setBounds(300,480,800,100);
+            if (dr_cr == 0) {//dr==0,cr==1
+                transaction_details.setText("⭧ Paid To:");
+                transaction_details.setForeground(Color.RED);
+                transaction_details2.setBounds(220, 480, 800, 100);
+            } else {
+                transaction_details.setText("⭩ Received from:");
+                transaction_details.setForeground(Color.GREEN);
+                transaction_details2.setBounds(300, 480, 800, 100);
+            }
+            dash_contents.add(transaction_details2);
         }
 
         dash_contents.add(name_lab);
@@ -669,7 +670,6 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         dash_contents.add(bal);
         dash_contents.add(recent_transaction);
         dash_contents.add(transaction_details);
-        dash_contents.add(transaction_details2);
         dash_pan.add(dash_contents);
         return dash_pan;
     }
