@@ -161,7 +161,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
     }
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource()==log_out){this.dispose();/*new FirstPage();*/}
+        if(e.getSource()==log_out){this.dispose();new FirstPage();}
         if(e.getSource()==verify_ben){
             cannot_transfer.setVisible(false);
             if(transfer_details_verify()){
