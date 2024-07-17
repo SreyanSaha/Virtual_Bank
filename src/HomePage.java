@@ -55,7 +55,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         label2.setForeground(new Color(0,0,100));
         label2.setVisible(true);
 
-        ImageIcon image2 = new ImageIcon("src/vb_nobg.png");
+        ImageIcon image2 = new ImageIcon("E:\\JDBC_programming\\JDBC_project\\src\\vb_nobg.png");
         JLabel label3=new JLabel();
         label3.setIcon(image2);
         label3.setBounds(730,20,450,100);
@@ -129,7 +129,7 @@ public class HomePage extends JFrame implements ActionListener, MouseListener {
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.setSize(1920, 1080);
         this.setTitle("Virtual Bank");
-        ImageIcon image = new ImageIcon("src/vb.jpg");
+        ImageIcon image = new ImageIcon("E:\\JDBC_programming\\JDBC_project\\src\\vb.jpg");
         this.setIconImage(image.getImage());
         this.getContentPane().setBackground(Color.BLACK);
         this.setLayout(null);
